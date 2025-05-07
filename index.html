@@ -24,68 +24,80 @@
 <body>
   <div id="output"></div>
   <script>
-    // 2. 使用全局 Vex
-    const VF = Vex.Flow;
-    const urlParams = new URLSearchParams(window.location.search);
-    const note = urlParams.get('note');
-    
-    const div = document.getElementById("output");
-    const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
-    renderer.resize(700, 300);
-    const context = renderer.getContext();
+  const VF = Vex.Flow;
+  const div = document.getElementById("output");
+  const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+  renderer.resize(700, 300);
+  const context = renderer.getContext();
 
+  // 1. 只绘制空谱表和竖线、花括号
+  function drawStaves() {
+    // 高音谱号
     const treble = new VF.Stave(40, 40, 300)
-        .addClef("treble")
-        .setContext(context)
-        .setEndBarType(VF.Barline.type.NONE)  // 取消右端竖线
-        .draw();
+      .addClef("treble")
+      .setContext(context)
+      .setEndBarType(VF.Barline.type.NONE)
+      .draw();
 
-    const bass = new VF.Stave(40, 140, 300)     
-       .addClef("bass")
-       .setContext(context)
-       .setEndBarType(VF.Barline.type.NONE)  // 取消右端竖线
-       .draw();
-    
-        // —— 手动绘制贯穿高低谱的竖线 ——  
-    const lineX = treble.getX();
+    // 低音谱号
+    const bass = new VF.Stave(40, 140, 300)
+      .addClef("bass")
+      .setContext(context)
+      .setEndBarType(VF.Barline.type.NONE)
+      .draw();
+
+    // 手动画贯穿竖线
+    const x = treble.getX();
     const yTop = treble.getYForLine(0);
-    const yBottom = bass.getYForLine(4);
+    const yBot = bass.getYForLine(4);
     context.beginPath();
-    context.moveTo(lineX, yTop);
-    context.lineTo(lineX, yBottom);
+    context.moveTo(x, yTop);
+    context.lineTo(x, yBot);
     context.setLineWidth(2);
     context.stroke();
 
-    // —— 再画左侧花括号 ——  
+    // 画花括号
     new VF.StaveConnector(treble, bass)
       .setType(VF.StaveConnector.type.BRACE)
       .setContext(context)
       .draw();
-    
-    if (note) {
-      const parts = note.toLowerCase().match(/^([a-g])(#?)(\d)$/);
-      if (!parts) throw new Error("Invalid note: " + note);
-      const [_, l, s, o] = parts;
-      const key = `${l}/${o}`;
+  }
 
-            // 15. 根据八度判断绘制在哪个谱表：4 及以上用高音谱号，小于 4 用低音谱号
-      const octaveNum = parseInt(o, 10);
-      const useTreble = octaveNum >= 4;
-      // 16. 创建对应谱表的音符
-      const noteObj = new VF.StaveNote({
-        clef: useTreble ? "treble" : "bass",
-        keys: [key],
-        duration: "q",
-      });
-      // 17. 如果有升号，则添加 Accidentals
-      if (s) noteObj.addAccidental(0, new VF.Accidental("#"));
-      // 18. 创建 Voice 对象并添加音符
-      const voice = new VF.Voice({ num_beats: 1, beat_value: 4 }).addTickables([noteObj]);
-      // 20. 格式化并布局音符
-      new VF.Formatter().joinVoices([voice]).format([voice], 500);
-      // 21. 在对应的谱表上绘制音符
-      voice.draw(context, useTreble ? treble : bass);
+  // 2. 在空谱表基础上按需绘制单个音符
+  function renderNote(note) {
+    drawStaves();
+    if (!note) return;
+    const parts = note.toLowerCase().match(/^([a-g])(#?)(\d)$/);
+    if (!parts) throw new Error("Invalid note: " + note);
+    const [_, letter, sharp, octave] = parts;
+    const key = `${letter}/${octave}`;
+    const useTreble = parseInt(octave, 10) >= 4;
+
+    const staveRef = useTreble
+      ? new VF.Stave(40, 40, 300)
+      : new VF.Stave(40, 140, 300); // We only need a reference for voice.draw
+
+    const noteObj = new VF.StaveNote({
+      clef: useTreble ? "treble" : "bass",
+      keys: [key],
+      duration: "q",
+    });
+    if (sharp) noteObj.addAccidental(0, new VF.Accidental("#"));
+
+    const voice = new VF.Voice({ num_beats: 1, beat_value: 4 }).addTickables([noteObj]);
+    new VF.Formatter().joinVoices([voice]).format([voice], 300);
+    voice.draw(context, useTreble ? treble : bass);
+  }
+
+  // 3. 初次根据 URL 渲染
+  renderNote(new URLSearchParams(window.location.search).get("note"));
+
+  // 4. 监听小程序 postMessage，动态更新
+  window.addEventListener("message", (evt) => {
+    if (evt.data && evt.data.note) {
+      renderNote(evt.data.note);
     }
+  });
   </script>
 </body>
 </html>
