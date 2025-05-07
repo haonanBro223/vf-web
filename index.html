@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>VexFlow Sheet </title>
+    <script src="https://unpkg.com/vexflow/releases/vexflow-debug.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        #output {
+            width: 90%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="output"> </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const note = urlParams.get('note') || 'c4';
+
+        const VF = Vex.Flow;
+        const div = document.getElementById("output");
+        const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+
+        renderer.resize(700, 300);
+        const context = renderer.getContext();
+
+        const treble = new VF.Stave(10, 40, 600);
+        treble.addClef("treble").addTimeSignature("4/4").setContext(context).draw();
+
+        const bass = new VF.Stave(10, 160, 600);
+        bass.addClef("bass").addTimeSignature("4/4").setContext(context).draw();
+
+        const parts = note.toLowerCase().match(/^([a-g])(#?)(\d)$/);
+        if (!parts) throw new Error("Invalid note format: " + note);
+        const [_, letter, sharp, octave] = parts;
+        const key = `${letter}/${octave}`;
+
+        const trebleNote = new VF.StaveNote({ clef: "treble", keys: [key], duration: "q" });
+        const bassNote = new VF.StaveNote({ clef: "bass", keys: [key], duration: "q" });
+        if (sharp) {
+            trebleNote.addAccidental(0, new VF.Accidental("#"));
+            bassNote.addAccidental(0, new VF.Accidental("#"));
+        }
+
+        const voice1 = new VF.Voice({ num_beats: 1, beat_value: 4 }).addTickables([trebleNote]);
+        const voice2 = new VF.Voice({ num_beats: 1, beat_value: 4 }).addTickables([bassNote]);
+
+        new VF.Formatter().joinVoices([voice1]).format([voice1], 500);
+        new VF.Formatter().joinVoices([voice2]).format([voice2], 500);
+
+        voice1.draw(context, treble);
+        voice2.draw(context, bass);
+    </script>
+    </body>
+
+</html>
