@@ -23,11 +23,22 @@
     const context = renderer.getContext();
 
     const treble = new VF.Stave(10, 40, 600);
-    treble.addClef("treble").addTimeSignature("4/4").setContext(context).draw();
+    treble.addClef("treble")
+        .setContext(context)
+        .setEndBarType(VF.Barline.type.NONE)  // 取消右端竖线
+        .draw();
 
     const bass = new VF.Stave(10, 160, 600);
-    bass.addClef("bass").addTimeSignature("4/4").setContext(context).draw();
-
+    bass.addClef("bass")
+       .setContext(context)
+       .setEndBarType(VF.Barline.type.NONE)  // 取消右端竖线
+       .draw();
+    
+    const connector = new VF.StaveConnector(treble, bass);
+    connector.setType(VF.StaveConnector.type.BRACE)
+           .setContext(context)
+           .draw();
+    
     if (note) {
       const parts = note.toLowerCase().match(/^([a-g])(#?)(\d)$/);
       if (!parts) throw new Error("Invalid note: " + note);
