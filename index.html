@@ -6,8 +6,20 @@
   <!-- 1. 引入 UMD 构建 -->
   <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.3/releases/vexflow-min.js"></script>
   <style>
-    /* ... your styles ... */
-  </style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+     /* 输出容器允许溢出，并给左侧留出 20px 空间 */
+     #output {
+       overflow: visible;
+       padding-left: 20px;
+    }
+     /* SVG 本身允许溢出 */
+    svg {
+       overflow: visible;
+    }
+  <style>
 </head>
 <body>
   <div id="output"></div>
