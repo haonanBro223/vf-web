@@ -22,16 +22,16 @@
     renderer.resize(700, 300);
     const context = renderer.getContext();
 
-    const treble = new VF.Stave(40, 40, 300);
-    treble.addClef("treble")
+    const treble = new VF.Stave(40, 40, 300)
         .setBegBarType(VF.Barline.type.SINGLE)
+        .addClef("treble")
         .setContext(context)
         .setEndBarType(VF.Barline.type.NONE)  // 取消右端竖线
         .draw();
 
-    const bass = new VF.Stave(40, 140, 300);
-    bass.addClef("bass")
+    const bass = new VF.Stave(40, 140, 300)
        .setBegBarType(VF.Barline.type.SINGLE) 
+       .addClef("bass")
        .setContext(context)
        .setEndBarType(VF.Barline.type.NONE)  // 取消右端竖线
        .draw();
