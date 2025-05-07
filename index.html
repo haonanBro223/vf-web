@@ -53,6 +53,12 @@
       .setType(VF.StaveConnector.type.BRACE)
       .setContext(context)
       .draw();
+
+    new VF.StaveConnector(treble, bass)
+      .setType(VF.StaveConnector.type.SINGLE)
+      .setContext(context)
+      .setLineThickness(2)
+      .draw();
     
     if (note) {
       const parts = note.toLowerCase().match(/^([a-g])(#?)(\d)$/);
