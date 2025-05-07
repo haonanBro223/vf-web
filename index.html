@@ -42,10 +42,9 @@
 
     // —— 再画左侧单实线 ——  
     new VF.StaveConnector(treble, bass)
-      .setType(VF.StaveConnector.type.SINGLE_LEFT)
+      .setType(VF.StaveConnector.type.SINGLE)
       .setLineThickness(2)   // 可调整线宽
       .setContext(context)
-      .setXshift(-20)
       .draw();
     
     if (note) {
