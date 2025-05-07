@@ -15,7 +15,7 @@
     // 2. 使用全局 Vex
     const VF = Vex.Flow;
     const urlParams = new URLSearchParams(window.location.search);
-    const note = urlParams.get('note') || 'c4';
+    const note = urlParams.get('note');
     
     const div = document.getElementById("output");
     const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
@@ -28,24 +28,26 @@
     const bass = new VF.Stave(10, 160, 600);
     bass.addClef("bass").addTimeSignature("4/4").setContext(context).draw();
 
-    const parts = note.toLowerCase().match(/^([a-g])(#?)(\d)$/);
-    if (!parts) throw new Error("Invalid note: " + note);
-    const [_, l, s, o] = parts;
-    const key = `${l}/${o}`;
+    if (note) {
+      const parts = note.toLowerCase().match(/^([a-g])(#?)(\d)$/);
+      if (!parts) throw new Error("Invalid note: " + note);
+      const [_, l, s, o] = parts;
+      const key = `${l}/${o}`;
 
-    const trebleNote = new VF.StaveNote({ clef: "treble", keys: [key], duration: "q" });
-    const bassNote   = new VF.StaveNote({ clef: "bass",   keys: [key], duration: "q" });
-    if (s) {
-      trebleNote.addAccidental(0, new VF.Accidental("#"));
-      bassNote.addAccidental(0, new VF.Accidental("#"));
+      const trebleNote = new VF.StaveNote({ clef: "treble", keys: [key], duration: "q" });
+      const bassNote   = new VF.StaveNote({ clef: "bass",   keys: [key], duration: "q" });
+      if (s) {
+        trebleNote.addAccidental(0, new VF.Accidental("#"));
+        bassNote.addAccidental(0, new VF.Accidental("#"));
+      }
+
+      const voice1 = new VF.Voice({ num_beats: 1, beat_value: 4 }).addTickables([trebleNote]);
+      const voice2 = new VF.Voice({ num_beats: 1, beat_value: 4 }).addTickables([bassNote]);
+      new VF.Formatter().joinVoices([voice1]).format([voice1], 500);
+      new VF.Formatter().joinVoices([voice2]).format([voice2], 500);
+      voice1.draw(context, treble);
+      voice2.draw(context, bass);
     }
-
-    const voice1 = new VF.Voice({ num_beats: 1, beat_value: 4 }).addTickables([trebleNote]);
-    const voice2 = new VF.Voice({ num_beats: 1, beat_value: 4 }).addTickables([bassNote]);
-    new VF.Formatter().joinVoices([voice1]).format([voice1], 500);
-    new VF.Formatter().joinVoices([voice2]).format([voice2], 500);
-    voice1.draw(context, treble);
-    voice2.draw(context, bass);
   </script>
 </body>
 </html>
