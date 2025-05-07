@@ -46,16 +46,16 @@
        .setEndBarType(VF.Barline.type.NONE)  // 取消右端竖线
        .draw();
     
-    // —— 在两条谱表之间画左侧花括号 ——  
-    new VF.StaveConnector(treble, bass)
-      .setType(VF.StaveConnector.type.BRACE)
-      .setContext(context)
-      .draw();
-
+    // —— 在两条谱表之间画左侧竖线和花括号 ——  
     new VF.StaveConnector(treble, bass)
       .setType(VF.StaveConnector.type.SINGLE)
       .setContext(context)
       .setLineThickness(2)
+      .draw();
+    
+    new VF.StaveConnector(treble, bass)
+      .setType(VF.StaveConnector.type.BRACE)
+      .setContext(context)
       .draw();
     
     if (note) {
