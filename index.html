@@ -20,6 +20,17 @@
        overflow: visible;
     }
   </style>
+  <script>
+    // Hide everything except the #output container when embed=1
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('embed') === '1') {
+      document.addEventListener('DOMContentLoaded', () => {
+        Array.from(document.body.children).forEach(el => {
+          if (el.id !== 'output') el.style.display = 'none';
+        });
+      });
+    }
+  </script>
 </head>
 <body>
   <div id="output"></div>
