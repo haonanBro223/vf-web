@@ -21,13 +21,13 @@
     }
   </style>
   <script>
-    // Hide everything except the #output container when embed=1
+    // If embed=1, strip out all body content except output
     const params = new URLSearchParams(window.location.search);
     if (params.get('embed') === '1') {
       document.addEventListener('DOMContentLoaded', () => {
-        Array.from(document.body.children).forEach(el => {
-          if (el.id !== 'output') el.style.display = 'none';
-        });
+                const output = document.getElementById('output');
+        document.body.innerHTML = '';
+        document.body.appendChild(output);
       });
     }
   </script>
