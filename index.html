@@ -6,6 +6,9 @@
   <!-- 1. 引入 UMD 构建 -->
   <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.3/releases/vexflow-min.js"></script>
   <style>
+    html, body { margin: 0; padding: 0; }
+    body.embed > *:not(#output) { display: none !important; }
+    body.embed #output { width: 100vw; height: 100vh; }
     body {
       margin: 0;
       padding: 0;
@@ -21,13 +24,12 @@
     }
   </style>
   <script>
-    // If embed=1, strip out all body content except output
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     if (params.get('embed') === '1') {
+      document.documentElement.classList.add('embed');
+      // Also set body class in case CSS needs it
       document.addEventListener('DOMContentLoaded', () => {
-                const output = document.getElementById('output');
-        document.body.innerHTML = '';
-        document.body.appendChild(output);
+      document.body.classList.add('embed');
       });
     }
   </script>
